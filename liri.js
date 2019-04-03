@@ -1,26 +1,38 @@
 require("dotenv").config();
-var keys = require("./keys.js");
-var axios = require("axios");
-var Spotify = require("node-spotify-api");
-var moment = require("moment");
-var userRequest = process.argv[2];
-var userInput = process.argv[3];
+const keys = require("./keys.js");
+const axios = require("axios");
+const Spotify = require("node-spotify-api");
+const moment = require("moment");
+const fs = require("fs");
+let userRequest = process.argv[2];
+let userInput = process.argv[3];
 
 var spotify = new Spotify(keys.spotify);
-
-switch (userRequest) {
-  case "concert-this":
-    concertThis(userInput);
-    break;
-  case "spotify-this-song":
-    spotifyThis(userInput);
-    break;
-  case "movie-this":
-    movieThis(userInput);
-    break;
-  default:
-    console.log("please enter valid command");
-    break;
+if (userRequest === "do-what-it-says") {
+  fs.readFile("random.txt", "utf8", function(error, data) {
+    var output = data.split(",");
+    userRequest = output[0];
+    userInput = output[1];
+    selectCommand(userRequest, userInput);
+  });
+} else {
+  selectCommand(userRequest, userInput);
+}
+function selectCommand(userRequest, userInput) {
+  switch (userRequest) {
+    case "concert-this":
+      concertThis(userInput);
+      break;
+    case "spotify-this-song":
+      spotifyThis(userInput);
+      break;
+    case "movie-this":
+      movieThis(userInput);
+      break;
+    default:
+      console.log("please enter valid command");
+      break;
+  }
 }
 
 function concertThis(artist) {
@@ -50,7 +62,7 @@ function spotifyThis(track) {
     .then(function(response) {
       const results = response.tracks.items;
       const detail = results.map(result => ({
-        artist: result.artists.map(artist => artist.name).join(", "),
+        // artist: result.artists.map(artist => artist.name).join(", "),
         songName: result.name,
         previewUrl: result.preview_url,
         albumName: result.album.name
