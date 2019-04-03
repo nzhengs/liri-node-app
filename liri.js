@@ -4,20 +4,12 @@ const axios = require("axios");
 const Spotify = require("node-spotify-api");
 const moment = require("moment");
 const fs = require("fs");
-let userRequest = process.argv[2];
-let userInput = process.argv[3];
-
+const userRequest = process.argv[2];
+const userInput = process.argv[3];
 var spotify = new Spotify(keys.spotify);
-if (userRequest === "do-what-it-says") {
-  fs.readFile("random.txt", "utf8", function(error, data) {
-    var output = data.split(",");
-    userRequest = output[0];
-    userInput = output[1];
-    selectCommand(userRequest, userInput);
-  });
-} else {
-  selectCommand(userRequest, userInput);
-}
+
+selectCommand(userRequest, userInput);
+
 function selectCommand(userRequest, userInput) {
   switch (userRequest) {
     case "concert-this":
@@ -27,7 +19,10 @@ function selectCommand(userRequest, userInput) {
       spotifyThis(userInput);
       break;
     case "movie-this":
-      movieThis(userInput);
+      movieThis(userInput || "Mr. Nobody");
+      break;
+    case "do-what-it-says":
+      doWhatItSays();
       break;
     default:
       console.log("please enter valid command");
@@ -62,7 +57,7 @@ function spotifyThis(track) {
     .then(function(response) {
       const results = response.tracks.items;
       const detail = results.map(result => ({
-        // artist: result.artists.map(artist => artist.name).join(", "),
+        artist: result.artists.map(artist => artist.name).join(", "),
         songName: result.name,
         previewUrl: result.preview_url,
         albumName: result.album.name
@@ -100,5 +95,14 @@ function movieThis(name) {
 
       console.log(movie);
     }
+  });
+}
+
+function doWhatItSays() {
+  fs.readFile("random.txt", "utf8", function(error, data) {
+    var output = data.split(",");
+    const request = output[0];
+    const input = output[1];
+    selectCommand(request, input);
   });
 }
