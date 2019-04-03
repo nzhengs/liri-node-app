@@ -16,7 +16,7 @@ function selectCommand(userRequest, userInput) {
       concertThis(userInput);
       break;
     case "spotify-this-song":
-      spotifyThis(userInput);
+      spotifyThis(userInput|| "The Sign");
       break;
     case "movie-this":
       movieThis(userInput || "Mr. Nobody");
